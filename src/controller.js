@@ -25,6 +25,7 @@ module.exports = class Controller{
         key.release = undefined;
         //The `downHandler`
         key.downHandler = function(event) {
+            //console.log(event.keyCode);
             if (event.keyCode === key.code) {
                 if (key.isUp && key.press) key.press();
                 key.isDown = true;

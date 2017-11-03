@@ -19,7 +19,8 @@ const ctrl = new Controller({
     forward: 38,
     backward: 40,
     left: 37,
-    right: 39
+    right: 39,
+    break: 16
 });
 const stage = new Container();
 const renderer = autoDetectRenderer();
@@ -34,6 +35,7 @@ let map = new Map("/assets/map.png");
 loader
     .add('car', "assets/car.png")
     .add('map', "assets/map.png")
+    .add('crate', "assets/crate.png")
     .load(setup);
 
 function setup() {
@@ -51,17 +53,25 @@ function setup() {
     circle.beginFill(0x9966FF);
     circle.drawCircle(0, 0, 16);
     circle.endFill();
-    circle.x = 64;
-    circle.y = 130;
+    circle.x = 600;
+    circle.y = 290;
     circle.radius = 16;
+    map.circle = circle;
     stage.addChild(circle);
 
+
+    let box = new Sprite(TextureCache["assets/crate.png"])
+    box.x=400;
+    box.y=400;
+    map.box = box;
+    stage.addChild(box);
+
     let sprite = new Sprite(TextureCache["assets/car.png"]);
-    sprite.scale.x = 0.3;
-    sprite.scale.y = 0.3;
+    sprite.scale.x = 0.2;
+    sprite.scale.y = 0.2;
     sprite.anchor.x = 0.5;
     sprite.anchor.y = 0.5;
-    car = new Car(ctrl, sprite, 100,100,2);
+    car = new Car(ctrl, sprite, 150,350,0);
     stage.addChild(sprite);
 
     resize();

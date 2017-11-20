@@ -1,10 +1,14 @@
 const Vec = require('./vec');
 const PIXI = require('pixi.js');
 const Point = PIXI.Point;
+const Bump = require('bump.js');
+const bump = new Bump(PIXI);
 
 module.exports ={
     checkCollisionCircleToRect,
-    checkCollisionRectToRect
+    checkCollisionRectToRect,
+    checkCollisions,
+    checkCollision
 };
 
 function checkCollisionPolyToRect(poly, rect){
@@ -52,12 +56,12 @@ function intersects(a,b, c,d){
     return false;
 }
 
-function castOnAxis(sprite, axis){
+function castOnAxis(points, axis){
     let nega = axis.clone().neg();
     let max = -Infinity;
     let min = Infinity;
-    for(let i = 0; i < 4; i++) {
-        let b = new Vec(sprite.vertexData[i*2],sprite.vertexData[i*2+1]);
+    for(let i = 0; i < points.length; i++) {
+        let b = points[i];
         let v = Vec.Dot(b, axis)/Vec.Dot(nega,nega);
         if(v < min) min = v;
         if(v > max) max = v;
@@ -72,44 +76,75 @@ function intersects2(r1,r2,axis){
 }
 
 
+function makeVecFromVertices(arr){
+    let ret = [];
+    for(let i = 0; i < arr.length; i+=2){
+        ret.push(new Vec(arr[i], arr[i+2]));
+    }
+    return ret;
+}
+
 
 function checkCollisionRectToRect(r1, r2) {
-    r1.calculateVertices();
-    r2.calculateVertices();
-    let a = new Vec(r2.vertexData[0],r2.vertexData[1]);
-    let b = new Vec(r2.vertexData[2],r2.vertexData[3]);
-    let axis1 = b.sub(a);
-    console.log(axis1);
+    //console.log(r1.toLocal({x:0,y:0}, r2).x*r1.scale.x);
+    let b1 = r1.getLocalBounds();
+    let b2 = r2.getLocalBounds();
+    let arr1 = [
+        new Vec(b1.x, b1.y),
+        new Vec(b1.x, b1.y+b1.height),
+        new Vec(b1.x+b1.width, b1.y+b1.height),
+        new Vec(b1.x+b1.width, b1.y),
+    ];
+    let arr2 = [
+        new Point(b2.x, b2.y),
+        new Point(b2.x, b2.y+b2.height),
+        new Point(b2.x+b2.width, b2.y+b2.height),
+        new Point(b2.x+b2.width, b2.y),
+    ].map(p=>r1.toLocal(p, r2)).map(p=>new Vec(p.x, p.y));
 
-    //console.log(castOnAxis(r2, axis1));
-    //console.log(intersects2(r1,r2, axis1));
+    if(!intersects2(arr1,arr2, new Vec(0,1))) return false;
+    if(!intersects2(arr1,arr2, new Vec(1,0))) return false;
+    if(!intersects2(arr1,arr2, arr2[0].clone().sub(arr2[1]))) return false;
+    if(!intersects2(arr1,arr2, arr2[1].clone().sub(arr2[2]))) return false;
+    let v = new Vec(r1.x-r2.x, r1.y-r2.y);
+    return v.divp(v.len());
+}
 
+
+function checkCollision(sprite, ob){
+    if(hitPossible(sprite, ob)){
+        if(ob.colliderType === 'rect'){
+            return checkCollisionRectToRect(sprite, ob);
+        }else if(ob.colliderType === 'radius'){
+            return checkCollisionCircleToRect(ob,sprite);
+        }
+    }
     return false;
+}
 
 
-
-
-    //console.log(r2.calculateVertices());
-    //console.log(r2.vertexData);
-    let lr1 = extractRectLocalCorners(r1);
-    let lr2 = extractRectLocalCorners(r2);
-
-    let lr1r2 = cornersToLocalSprite(r1, extractRectGlobalCorners(r2, lr2));
-    if (!intersects(min(lr1, 'x'), max(lr1, 'x'), min(lr1r2, 'x'), max(lr1r2, 'x'))) {
-        return false;
+function checkCollisions(sprite, map){
+    for(let key in map.obstacles){
+        let ob = map.obstacles[key];
+        if(hitPossible(sprite, ob)){
+            if(ob.colliderType === 'rect'){
+                let col = checkCollisionRectToRect(sprite, ob);
+                if(col) return col;
+            }else if(ob.colliderType === 'radius'){
+                let col = checkCollisionCircleToRect(ob,sprite);
+                if(col) return col;
+            }
+        }
     }
-    if (!intersects(min(lr1, 'y'), max(lr1, 'y'), min(lr1r2, 'y'), max(lr1r2, 'y'))) {
-        return false;
-    }
+    return false;
+}
 
-    let lr2r1 = cornersToLocalSprite(r2, extractRectGlobalCorners(r1, lr1));
-    if (!intersects(min(lr2, 'x'), max(lr2, 'x'), min(lr2r1, 'x'), max(lr2r1, 'x'))) {
-        return false;
-    }
-    if (!intersects(min(lr2, 'y'), max(lr2, 'y'), min(lr2r1, 'y'), max(lr2r1, 'y'))) {
-        return false;
-    }
-    return true;
+
+function hitPossible(s1, s2){
+    let b1 = s1.getBounds();
+    let b2 = s2.getBounds();
+    return intersects(b1.x-1, b1.x+b1.width+1, b2.x-1, b2.x+b2.width+1) &&
+        intersects(b1.y-1, b1.y+b1.height+1, b2.y-1, b2.y+b2.height+1)
 }
 
 

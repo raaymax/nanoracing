@@ -56,8 +56,6 @@ module.exports = class Map {
         stage.addChild(box);
     }
 
-    create
-
     initBackground(source){
         this.canvas = document.createElement('canvas');
         var myImg = new Image();

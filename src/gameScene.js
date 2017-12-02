@@ -1,7 +1,7 @@
 const PIXI = require('pixi.js');
 const Car = require('./car.js');
 const Controller = require('./controller.js');
-
+const Camera = require('./camera');
 const Container = PIXI.Container;
 const TextureCache = PIXI.utils.TextureCache;
 const Texture = PIXI.Texture;
@@ -37,14 +37,6 @@ module.exports = class GameScene extends Container{
         this.winner = null;
         this.map = map;
 
-
-
-
-
-
-        //floor.beginFill(0xaaaaaa);
-        //floor.drawRect(10, 10, 1000, 600);
-        //floor.endFill();
         map.init(this);
         var canvasTexture = PIXI.Texture.fromCanvas(map.drawableCanvas);
         drawable = new PIXI.Sprite(canvasTexture);
@@ -60,11 +52,7 @@ module.exports = class GameScene extends Container{
         circle.radius = 16;
         map.obstacles.push(circle);
         this.addChild(circle);
-
-
-
-
-
+        
 
         this.createBoxObstacle(400,400);
         this.createBoxObstacle(600,200,0.6);
@@ -96,6 +84,8 @@ module.exports = class GameScene extends Container{
         this.car2 = car2;
         this.drawable = drawable;
 
+        this.camera = new Camera(this, car, car2)
+
 
     }
 
@@ -109,57 +99,8 @@ module.exports = class GameScene extends Container{
         this.drawable.texture.update();
         this.car.update(this.map);
         this.car2.update(this.map);
-        let w = window.innerWidth;
-        let h = window.innerHeight;
-        let sw = window.innerWidth/this.scale.x;
-        let sh = window.innerHeight/this.scale.y;
-        let mw = this.map.width;
-        let mh = this.map.height;
-
-        let ratio = w/h;
-
-
-        let rect = {
-            x: Math.min(this.car.sprite.x,this.car2.sprite.x)-300,
-            y: Math.min(this.car.sprite.y,this.car2.sprite.y)-300,
-            x2:Math.max(this.car.sprite.x,this.car2.sprite.x)+300,
-            y2:Math.max(this.car.sprite.y,this.car2.sprite.y)+300
-        };
-
-
-        //rect.x = rect.x+(sw>rect.w)?sw-rect.w:0;
-        //rect.y = rect.y+(sh>rect.h)?sh-rect.h:0;
-        if(rect.x < 0){
-            rect.x = 0;
-        }
-        if(rect.y < 0){
-            rect.y = 0;
-        }
-        /*if(rect.x2 > mw){
-            rect.x2 = mw;
-        }
-        if(rect.y2 > mh){
-            rect.y2 = mh;
-        }*/
-
-        //console.log(rect);
-        rect.w = rect.x2-rect.x;
-        rect.h = rect.y2-rect.y;
-
-
-        let zoom = Math.min(w/rect.w,h/rect.h,1.0);
-
-        this.pivot.x = rect.x;
-        this.pivot.y = rect.y;
-
-        this.scale.x = zoom;
-        this.scale.y = zoom;
-
+        this.camera.update();
     }
-
-
-
-
 
     createCheckoint(x,y,width, height,rotation){
         let box = new Graphics();

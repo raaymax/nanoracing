@@ -4,6 +4,10 @@ module.exports = class Vec{
         return new Vec(Math.sin(dir), -Math.cos(dir));
     }
 
+    static Zero(dir){
+        return new Vec(0, 0);
+    }
+
     static Dot(v1,v2){
         return v1.x*v2.x+v1.y*v2.y;
     }

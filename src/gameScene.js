@@ -96,7 +96,7 @@ module.exports = class GameScene extends Container{
         if(!this.winner && this.car2.loop >= 3){
             this.winner = 2;
         }
-        this.drawable.texture.update();
+        //this.drawable.texture.update();
         this.car.update(this.map);
         this.car2.update(this.map);
         this.camera.update();

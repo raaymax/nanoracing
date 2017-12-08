@@ -11,9 +11,16 @@ module.exports = class Vec{
     static Dot(v1,v2){
         return v1.x*v2.x+v1.y*v2.y;
     }
+
+    static Cross(v,w){
+        return v.x * w.y - v.y * w.x
+    }
     constructor(x=0,y=0){
         this.x = x;
         this.y = y;
+    }
+    isZero(){
+        return this.x === 0 && this.y === 0;
     }
 
     neg(){

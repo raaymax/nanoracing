@@ -231,25 +231,3 @@ Render.lookAt(render, {
 });
 
 
-
-
-Body.update = function(body, deltaTime, timeScale, correction) {
-    var deltaTimeSquared = Math.pow(deltaTime * timeScale * body.timeScale, 2);
-
-    // from the previous step
-    var frictionAir = 1 - body.frictionAir * timeScale * body.timeScale,
-        velocityPrevX = body.position.x - body.positionPrev.x,
-        velocityPrevY = body.position.y - body.positionPrev.y;
-
-    // update velocity with Verlet integration
-    body.velocity.x = (velocityPrevX * frictionAir * correction) + (body.force.x / body.mass) * deltaTimeSquared;
-    body.velocity.y = (velocityPrevY * frictionAir * correction) + (body.force.y / body.mass) * deltaTimeSquared;
-
-    body.positionPrev.x = body.position.x;
-    body.positionPrev.y = body.position.y;
-    body.position.x += body.velocity.x;
-    body.position.y += body.velocity.y;
-
-    // update angular velocity with Verlet integration
-    body.angularVelocity = ((body.angle - body.anglePrev) * frictionAir * correction) + (body.torque / body.inertia) * deltaTimeSquared;
-    body.anglePrev = body.angle;

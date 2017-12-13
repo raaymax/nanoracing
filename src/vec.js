@@ -15,6 +15,21 @@ module.exports = class Vec{
     static Cross(v,w){
         return v.x * w.y - v.y * w.x
     }
+    static New(x,y){
+        return new Vec(x,y);
+    }
+
+    castOnAxis(axis){
+        let nega = axis.clone().neg();
+        return Vec.Dot(axis, this) / Vec.Dot(nega, nega);
+    }
+
+    normalize(){
+        let l = this.len();
+        if(l===0) return this;
+        return this.divp(l);
+    }
+
     constructor(x=0,y=0){
         this.x = x;
         this.y = y;
@@ -27,6 +42,19 @@ module.exports = class Vec{
         this.x = -this.x;
         this.y = -this.y;
         return this;
+    }
+
+    atan2(){
+        return Math.atan2(this.x, this.y);
+    }
+
+    rotate(angle){
+        let cs = Math.cos(angle)
+        let sn = Math.sin(angle);
+        let px = x * cs - y * sn;
+        let py = x * sn + y * cs;
+        this.x = px;
+        this.y = py;
     }
 
     clone(){

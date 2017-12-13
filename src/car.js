@@ -4,7 +4,7 @@ const Vec = require('./vec');
 const Collisions = require('./collisions');
 const Sprite = PIXI.Sprite;
 const Graphics = PIXI.Graphics;
-const Model = require('./car2');
+const Model = require('./carModel');
 const Ferrari = require('./cars/ferrari');
 
 

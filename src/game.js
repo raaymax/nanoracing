@@ -1,6 +1,7 @@
 const SceneManager = require('./sceneManager');
 const MenuScene = require('./menuScene');
 const GameScene = require('./gameScene');
+const TestScene = require('./physics/PIXIRenderer');
 const WinnerScene = require('./winnerScene');
 const Map = require('./map');
 
@@ -23,6 +24,12 @@ module.exports = window.Game = new (class Game{
             this.scenes.goto('winner');
         }
     }
+
+    test(){
+        this.game = new TestScene();
+        this.scenes.add('game', this.game);
+        this.scenes.goto('game');
+    };
 
     newGame(){
         console.log('run');

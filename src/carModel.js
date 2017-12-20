@@ -1,4 +1,4 @@
-const Body = require('./body');
+const Body = require('./physics/body');
 const Vec = require('./vec');
 
 

@@ -9,7 +9,8 @@ module.exports = class MenuScene extends Container{
     constructor(game){
         super();
         this.game = game;
-        this.createButton(100,100,300,50, "Play");
+        this.createButton(100,100,300,50, "Play",()=>this.game.newGame());
+        this.createButton(100,200,300,50, "Test",()=>this.game.test());
     }
 
     update(){
@@ -17,7 +18,7 @@ module.exports = class MenuScene extends Container{
     }
 
 
-    createButton(x,y,w,h, text){
+    createButton(x,y,w,h, text, func){
         let box = new Graphics();
         box.beginFill(0xffffff);
         box.drawRect(0, 0, w, h);
@@ -60,7 +61,7 @@ module.exports = class MenuScene extends Container{
             box.scale.x = 1;
             box.scale.y = 1;
             console.log(this.game);
-            this.game.newGame();
+            func();
         });
 
         box.addChild(richText);
